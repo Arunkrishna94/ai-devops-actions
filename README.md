@@ -26,11 +26,22 @@ The script reads pipeline logs and asks an AI model to analyze them like a DevOp
 ai-devops-actions/
 │
 ├── scripts/
-│   └── ai-debugger.py
+│ └── ai-debugger.py
 │
-├── logs.txt
-├── .gitignore
-└── README.md
+├── logs/
+│ └── sample-log.txt
+│
+├── knowledge-base/
+│ ├── docker-build-error.md
+│ ├── kubernetes-crashloop.md
+│ ├── terraform-lock.md
+│ └── disk-space.md
+│
+├── .github/
+│ └── workflows/
+│ └── ai-debug.yml
+├── README.md
+└── .gitignore
 ```
 
 ---
@@ -162,6 +173,17 @@ response = client.chat.completions.create(
 
 print(response.choices[0].message.content)
 ```
+---
+
+## Knowledge Base
+
+The knowledge-base/ folder stores common CI/CD failure patterns:
+
+* docker-build-error.md
+* kubernetes-crashloop.md
+* terraform-lock.md
+* disk-space.md
+* The AI uses these patterns to match logs and suggest fixes.
 
 ---
 
@@ -183,6 +205,7 @@ This project demonstrates how AI can assist DevOps teams in:
 * CI/CD troubleshooting
 * Faster incident response
 * Automated root cause analysis
+* Maintaining a knowledge base for repeated errors
 
 ---
 
