@@ -1,4 +1,5 @@
 import os
+import requests
 from openai import OpenAI
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
@@ -18,18 +19,19 @@ for file in os.listdir("knowledge-base"):
 prompt = f"""
 You are a Senior DevOps engineer.
 
-Below is a knowledge base of CI/CD failures:
+Below is a knowledge base of CI/CD failure patterns.
 
+Knowledge Base:
 {knowledge}
 
-Now analyze this CI/CD log:
-
+CI/CD Log:
 {log_data}
 
-Provide:
-1. Root cause
-2. Suggested fix
-3. Whether it matches a known failure pattern
+Tasks:
+1. Identify the root cause.
+2. Suggest the fix.
+3. If the issue matches ANY knowledge base problem, explicitly say which one.
+4. If it does not match, say "New failure pattern".
 """
 
 response = client.chat.completions.create(
@@ -40,5 +42,26 @@ response = client.chat.completions.create(
     ]
 )
 
+analysis = response.choices[0].message.content
+
 print("====== AI ANALYSIS ======")
-print(response.choices[0].message.content)
+print(analysis)
+
+# Post comment to PR
+repo = os.environ.get("GITHUB_REPOSITORY")
+token = os.environ.get("GITHUB_TOKEN")
+pr_number = os.environ.get("PR_NUMBER")
+
+if pr_number:
+    url = f"https://api.github.com/repos/{repo}/issues/{pr_number}/comments"
+
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github+json"
+    }
+
+    body = {
+        "body": f"🤖 **AI CI Failure Analysis**\n\n{analysis}"
+    }
+
+    requests.post(url, json=body, headers=headers)
