@@ -1,0 +1,25 @@
+name: AI CI Debugger
+
+on:
+  push:
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install OpenAI
+        run: pip install openai
+
+      - name: Run AI Debugger
+        run: python scripts/ai-debugger.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
